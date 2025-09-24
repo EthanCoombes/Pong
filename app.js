@@ -10,6 +10,28 @@ const canvasWidth = canvas.width;
 
 let score = 0;
 let startTime = Date.now();
+let angle = 0;
+let pos;
+let gameloop;
+let scoreloop;
+
+function startAngle(){
+    pos = Math.random();
+        if (pos > 0.5 ){
+            pos = -1;
+        }
+        else {
+            pos = 1;
+        }
+
+    angle = Math.random();
+        while (angle < 0.1){
+            angle = Math.random();
+    }
+}
+
+
+
 scoreDisplay.textContent = 'Score : '+ score + ' s';
 
 const paddle = {
@@ -24,50 +46,46 @@ let ball = {
     x: canvasWidth / 2,
     y: canvasHeight - 25,
     radius: 7,
-    speed: 1,
+    speed: 5,
 };
 
 function positionObjet(){
     canva.clearRect(0, 0, canvasWidth, canvasHeight);
     canva.fillStyle = "white";
     canva.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+    canva.beginPath();
     canva.arc(ball.x, ball.y, ball.radius, 0, 360, false);
     canva.fill();
+    canva.closePath();
 }
 
 positionObjet();
 
 function jouer(){
     ball.y = ball.y - ball.speed;
-    pos = Math.random();
-    val = Math.random();
-    while (val < 0.5){
-        val = Math.random();
-    }
-    if (pos > 0.5 ){
-        ball.x = ball.x + val * ball.speed;
-    }else{
-        ball.x = ball.x - val * ball.speed;
-    }
+    ball.x = ball.x + (ball.speed * angle * pos); 
     positionObjet();
-    requestAnimationFrame(jouer);
+    gameloop = requestAnimationFrame(jouer);
 }
 
 function scoreTime(timestamp){
     score = Math.floor((Date.now() - startTime )  / 1000);
     scoreDisplay.textContent = 'Score : '+ score + ' s';
-    requestAnimationFrame(scoreTime);
+    scoreloop = requestAnimationFrame(scoreTime);
 }
 
 resetButton.addEventListener('click', () => {
+    cancelAnimationFrame(gameloop);
+    cancelAnimationFrame(scoreloop);
     paddle.x = canvasWidth / 2 - 40;
     ball.x = canvasWidth / 2,
     ball.y = canvasHeight - 25,
     score = 0;
     startTime = Date.now();
     positionObjet();
-    requestAnimationFrame(scoreTime);
-    requestAnimationFrame(jouer);
+    startAngle();
+    scoreloop = requestAnimationFrame(scoreTime);
+    gameloop = requestAnimationFrame(jouer);
 })
 
 leftMove.addEventListener('click', () => {
