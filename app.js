@@ -138,14 +138,7 @@ function scoreTime(timestamp){
 }
 
 resetButton.addEventListener('click', () => {
-    perdu = 0;
-    cancelAnimationFrame(gameloop);
-    cancelAnimationFrame(scoreloop);
-    score = 0;
-    startTime = Date.now();
-    paddle.x = canvasWidth / 2 - 30;
-    ball.x = canvasWidth / 2;
-    ball.y = canvasHeight - 25;
+    reset();
     ball.speed = 3;
     directiony = -1;
     movingLeft = false;
@@ -155,6 +148,22 @@ resetButton.addEventListener('click', () => {
     scoreloop = requestAnimationFrame(scoreTime);
     gameloop = requestAnimationFrame(jouer);
 })
+function reset(){
+    if (score > localStorage.getItem("highscore")){
+            localStorage.setItem("highscore", score);
+            recordDisplay.textContent = 'Meilleur score : '+ localStorage.getItem("highscore") + ' s';
+    }
+    perdu = 0;
+    cancelAnimationFrame(gameloop);
+    cancelAnimationFrame(scoreloop);
+    score = 0;
+    startTime = Date.now();
+    paddle.x = canvasWidth / 2 - 30;
+    ball.x = canvasWidth / 2;
+    ball.y = canvasHeight - 25;
+    positionObjet();
+    
+}
 
 
 document.addEventListener("keydown", (e) => {
@@ -187,7 +196,10 @@ colorChange.addEventListener('click', () => {
     const couleurCanvas = prompt("Quelle couleur voulez-vous pour l'arrière plan du jeu ? (En anglais svp)");
     canvas.style.backgroundColor = couleurCanvas;
     couleurOutils = prompt("Quelle couleur voulez-vous pour les outils ? (En anglais svp)");
+    
     positionObjet();
+    reset();
+   
 });
 
 
