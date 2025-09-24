@@ -11,17 +11,19 @@ const canvasWidth = canvas.width;
 let score = 0;
 let startTime = Date.now();
 let angle = 0;
-let pos;
+let directionx = 0;
+let directiony = -1;
 let gameloop;
 let scoreloop;
+let perdu = 1;
 
 function startAngle(){
-    pos = Math.random();
-        if (pos > 0.5 ){
-            pos = -1;
+    directionx = Math.random();
+        if (directionx > 0.5 ){
+            directionx = -1;
         }
         else {
-            pos = 1;
+            directionx = 1;
         }
 
     angle = Math.random();
@@ -30,14 +32,12 @@ function startAngle(){
     }
 }
 
-
-
 scoreDisplay.textContent = 'Score : '+ score + ' s';
 
 const paddle = {
-    width: 80,
+    width: 50,
     height: 10,
-    x: canvasWidth / 2 - 40,
+    x: canvasWidth / 2 - 25,
     y: canvasHeight - 15,
     speed : 8,
 };
@@ -46,7 +46,7 @@ let ball = {
     x: canvasWidth / 2,
     y: canvasHeight - 25,
     radius: 7,
-    speed: 5,
+    speed: 3,
 };
 
 function positionObjet(){
@@ -62,9 +62,31 @@ function positionObjet(){
 positionObjet();
 
 function jouer(){
-    ball.y = ball.y - ball.speed;
-    ball.x = ball.x + (ball.speed * angle * pos); 
-    positionObjet();
+    if (ball.x + ball.radius > canvasWidth){
+        directionx = -1;
+        if (ball.speed < 15)ball.speed = ball.speed + 0.2;
+    }
+    if (ball.x - ball.radius < 0){
+        directionx = 1;
+        if (ball.speed < 15)ball.speed = ball.speed + 0.2;
+    }
+    if (ball.y - ball.radius < 0){
+        directiony = 1;
+        if (ball.speed < 15)ball.speed = ball.speed + 0.2;
+    }
+    if (ball.y + ball.radius > paddle.y && ball.y + ball.radius < paddle.y + paddle.height && ball.x > paddle.x && ball.x < paddle.x + paddle.width){
+        directiony = -1;
+        if (ball.speed < 15)ball.speed = ball.speed + 0.2;
+    }
+    if (ball.y + ball.radius > canvasHeight){
+        cancelAnimationFrame(gameloop);
+        cancelAnimationFrame(scoreloop);
+        perdu = 1;
+        scoreDisplay.textContent = 'PERDU! Score final : '+ score + ' s';
+    }
+    ball.y = ball.y + ball.speed * directiony;
+    ball.x = ball.x + (ball.speed * angle * directionx); 
+    if (perdu == 0) positionObjet();
     gameloop = requestAnimationFrame(jouer);
 }
 
@@ -75,9 +97,10 @@ function scoreTime(timestamp){
 }
 
 resetButton.addEventListener('click', () => {
+    perdu = 0;
     cancelAnimationFrame(gameloop);
     cancelAnimationFrame(scoreloop);
-    paddle.x = canvasWidth / 2 - 40;
+    paddle.x = canvasWidth / 2 - 25;
     ball.x = canvasWidth / 2,
     ball.y = canvasHeight - 25,
     score = 0;
@@ -90,12 +113,12 @@ resetButton.addEventListener('click', () => {
 
 leftMove.addEventListener('click', () => {
     paddle.x = paddle.x - paddle.speed;
-    positionObjet();
+    if (perdu == 0) positionObjet();
 })
 
 rightMove.addEventListener('click', () => {
     paddle.x = paddle.x + paddle.speed;
-    positionObjet();
+    if (perdu == 0) positionObjet();
 })
 
 document.addEventListener("keydown", (e) => {
@@ -111,7 +134,7 @@ document.addEventListener("keydown", (e) => {
         default:
             break;
     }
-    positionObjet(); 
+    if (perdu == 0) positionObjet(); 
 });
 
 
