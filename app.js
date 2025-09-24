@@ -1,9 +1,15 @@
 const resetButton = document.getElementById('reset');
 const scoreDisplay = document.getElementById('score');
+const recordDisplay = document.getElementById('record');
+const colorChange = document.getElementById('color');
+const buttons = document.querySelectorAll('button');
+
 
 const leftMove = document.getElementById('left');
 document.getElementById("left").addEventListener("mouseup", () => movingLeft = false);
 document.getElementById("left").addEventListener("mousedown", () => movingLeft = true);
+document.getElementById("left").addEventListener("mouseleave", () => movingLeft = false);
+
 document.getElementById("left").addEventListener("touchstart", (e) => {
   e.preventDefault();
   movingLeft = true;
@@ -13,6 +19,8 @@ document.getElementById("left").addEventListener("touchend", () => movingLeft = 
 const rightMove = document.getElementById('right');
 document.getElementById("right").addEventListener("mouseup", () => movingRight = false);
 document.getElementById("right").addEventListener("mousedown", () => movingRight = true);
+document.getElementById("right").addEventListener("mouseleave", () => movingRight = false);
+
 document.getElementById("right").addEventListener("touchstart", (e) => {
   e.preventDefault();
   movingRight = true;
@@ -24,7 +32,8 @@ const canva = canvas.getContext("2d");
 const canvasHeight = canvas.height;
 const canvasWidth = canvas.width;
 
-
+localStorage.clear();
+localStorage.setItem("highscore", 0);
 let score = 0;
 let startTime = Date.now();
 let angle = 0;
@@ -35,6 +44,7 @@ let scoreloop;
 let perdu = 1;
 let movingLeft = false;
 let movingRight = false;
+couleurOutils = "white";
 
 function startAngle(){
     directionx = Math.random();
@@ -51,7 +61,9 @@ function startAngle(){
     }
 }
 
+
 scoreDisplay.textContent = 'Score : '+ score + ' s';
+recordDisplay.textContent = 'Meilleure score : Pas encore joué';
 
 const paddle = {
     width: 60,
@@ -70,7 +82,7 @@ let ball = {
 
 function positionObjet(){
     canva.clearRect(0, 0, canvasWidth, canvasHeight);
-    canva.fillStyle = "white";
+    canva.fillStyle = couleurOutils;
     canva.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
     canva.beginPath();
     canva.arc(ball.x, ball.y, ball.radius, 0, 360, false);
@@ -106,6 +118,10 @@ function jouer(){
         paddle.x = canvasWidth / 2 - 30;
         ball.x = canvasWidth / 2;
         ball.y = canvasHeight - 25;
+        if (score > localStorage.getItem("highscore")){
+            localStorage.setItem("highscore", score);
+            recordDisplay.textContent = 'Meilleur score : '+ localStorage.getItem("highscore") + ' s';
+        }
         positionObjet();
         scoreDisplay.textContent = 'PERDU! Score final : '+ score + ' s';
     }
@@ -131,7 +147,6 @@ resetButton.addEventListener('click', () => {
     ball.x = canvasWidth / 2;
     ball.y = canvasHeight - 25;
     ball.speed = 3;
-    directionx = 0;
     directiony = -1;
     movingLeft = false;
     movingRight = false;
@@ -141,30 +156,38 @@ resetButton.addEventListener('click', () => {
     gameloop = requestAnimationFrame(jouer);
 })
 
-leftMove.addEventListener('click', () => {
-    paddle.x = paddle.x - paddle.speed;
-    if (perdu == 0) positionObjet();
-})
-
-rightMove.addEventListener('click', () => {
-    paddle.x = paddle.x + paddle.speed;
-    if (perdu == 0) positionObjet();
-})
 
 document.addEventListener("keydown", (e) => {
-    switch (e.key) {
-        case "ArrowLeft":
-            if (paddle.x > 0) paddle.x -= paddle.speed;
-            break;
-
-        case "ArrowRight":
-            if (paddle.x + paddle.width < canvasWidth) paddle.x += paddle.speed;
-            break;
-
-        default:
-            break;
+    if (e.key === "ArrowLeft") {
+        movingLeft = true;
     }
-    if (perdu == 0) positionObjet(); 
+    if (e.key === "ArrowRight") {
+        movingRight = true;
+    }
+});
+
+document.addEventListener("keyup", (e) => {
+    if (e.key === "ArrowLeft") {
+        movingLeft = false;
+    }
+    if (e.key === "ArrowRight") {
+        movingRight = false;
+    }
+});
+
+colorChange.addEventListener('click', () => {
+    const couleurFond = prompt("Quelle couleur voulez-vous pour le fond ? (En anglais svp)");
+    document.body.style.backgroundColor = couleurFond;
+    const couleurBouton = prompt("Quelle couleur voulez-vous pour les boutons ? (En anglais svp)");
+    buttons.forEach(btn => {
+        btn.style.borderColor = couleurBouton;
+        btn.style.color = couleurBouton;
+        canvas.style.borderColor = couleurBouton;
+    });
+    const couleurCanvas = prompt("Quelle couleur voulez-vous pour l'arrière plan du jeu ? (En anglais svp)");
+    canvas.style.backgroundColor = couleurCanvas;
+    couleurOutils = prompt("Quelle couleur voulez-vous pour les outils ? (En anglais svp)");
+    positionObjet();
 });
 
 

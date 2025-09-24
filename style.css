@@ -6,10 +6,9 @@ body{
 
 canvas{
     border: solid 7px;
-    border-color: aqua;
+    border-color: lawngreen;
     background-color: black;
     border-radius: 3%;
-    margin-top: 20px;
 }
 
 button{
