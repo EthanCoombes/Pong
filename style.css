@@ -1,21 +1,22 @@
 body{
     text-align: center;
-    background-color: grey;
+    background-color: black;
     color: white;
 }
 
 canvas{
     border: solid 7px;
-    border-color: lawngreen;
-    background-color: black;
+    border-color: deepskyblue;
+    background-color: darkslategray;
     border-radius: 3%;
 }
 
 button{
-    color: green;
+    color: white;
     margin: 10px;
-    border-color: lawngreen;
+    border-color: coral;
     font-size: large;
+    background-color: transparent;
 }
 
 #left, #right{
@@ -30,6 +31,6 @@ button{
 }
 
 button:hover{
-    color: white;
-    background-color: green;
+    color: black;
+    background-color: coral;
 }

@@ -44,7 +44,9 @@ let scoreloop;
 let perdu = 1;
 let movingLeft = false;
 let movingRight = false;
-couleurOutils = "white";
+let couleurOutils = "deepskyblue";
+let acceleration = 0.2;
+
 
 function startAngle(){
     directionx = Math.random();
@@ -56,14 +58,14 @@ function startAngle(){
         }
 
     angle = Math.random();
-        while (angle < 0.1){
+        while (angle < 0.2 || angle > 0.9){
             angle = Math.random();
     }
 }
 
 
 scoreDisplay.textContent = 'Score : '+ score + ' s';
-recordDisplay.textContent = 'Meilleure score : Pas encore joué';
+recordDisplay.textContent = 'Meilleure score : Joue le plus longtemps possible!';
 
 const paddle = {
     width: 60,
@@ -97,19 +99,19 @@ function jouer(){
     if (movingRight && paddle.x + paddle.width < canvasWidth) paddle.x += paddle.speed /2;
     if (ball.x + ball.radius > canvasWidth){
         directionx = -1;
-        if (ball.speed < 15)ball.speed = ball.speed + 0.2;
+        if (ball.speed < 15)ball.speed = ball.speed + acceleration;
     }
     if (ball.x - ball.radius < 0){
         directionx = 1;
-        if (ball.speed < 15)ball.speed = ball.speed + 0.2;
+        if (ball.speed < 15)ball.speed = ball.speed + acceleration;
     }
     if (ball.y - ball.radius < 0){
         directiony = 1;
-        if (ball.speed < 15)ball.speed = ball.speed + 0.2;
+        if (ball.speed < 15)ball.speed = ball.speed + acceleration;
     }
     if (ball.y + ball.radius > paddle.y && ball.y + ball.radius < paddle.y + paddle.height && ball.x > paddle.x && ball.x < paddle.x + paddle.width){
         directiony = -1;
-        if (ball.speed < 15)ball.speed = ball.speed + 0.2;
+        if (ball.speed < 15)ball.speed = ball.speed + acceleration;
     }
     if (ball.y + ball.radius > canvasHeight){
         cancelAnimationFrame(gameloop);
@@ -148,6 +150,7 @@ resetButton.addEventListener('click', () => {
     scoreloop = requestAnimationFrame(scoreTime);
     gameloop = requestAnimationFrame(jouer);
 })
+
 function reset(){
     if (score > localStorage.getItem("highscore")){
             localStorage.setItem("highscore", score);
@@ -185,6 +188,9 @@ document.addEventListener("keyup", (e) => {
 });
 
 colorChange.addEventListener('click', () => {
+    let accel = parseInt(prompt("Quel niveau de difficulté voulez-vous ? (1 = facile, 2 = moyen, 3 = difficile, 4 = extrême)"));
+    if (isNaN(accel) || accel < 1 || accel > 4) accel = 2;
+    acceleration = accel / 10;
     const couleurFond = prompt("Quelle couleur voulez-vous pour le fond ? (En anglais svp)");
     document.body.style.backgroundColor = couleurFond;
     const couleurBouton = prompt("Quelle couleur voulez-vous pour les boutons ? (En anglais svp)");
